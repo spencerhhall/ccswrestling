@@ -129,49 +129,31 @@
                 wrestler.prevresults = null;
             }
 
-            console.log(":" + line);
+            //console.log(line);
 
 
 
             if (line != "") {
+                let results = parseResults(line);
+
+                if (results == null) {
+                    wrestler.results = null;
+                } else {
+                    line = results.pop();
+                    wrestler.results = results;
+                }
+
+
+
+
+                let capture = line.split(/(\d-\d|\d\d-\d\d|\d\d-\d|\d-\d\d|fall|\d:\d\d)/g);
+
+
 
             }
 
 
-            /* if (line.indexOf(" ") == -1) {
-                 wrestler.results = null;
-                 wrestler.hh = null;
-                 wrestler.prevresults = null;
-             } else {
 
-                 let results = parseResults(line);
-
-
-
-                 if (results == null) {
-                     wrestler.results = null;
-                 } else {
-                     line = results.pop();
-                     wrestler.results = results;
-                 }
-
-
-
-                 let hh = parseHeadHead(line);
-
-                 if (hh == null) {
-                     wrestler.hh = null;
-                 } else {
-                     if (hh.length > 1) {
-                         line = hh.pop();
-                     }
-
-                     wrestler.hh = hh;
-                 }
-
-
-
-             }*/
 
             wrestlers.push(wrestler);
         }
@@ -186,20 +168,31 @@
     function parseResults(line) {
         // It will either be a number from 0-10 or Cons.
         if (/\d/g.test(line.substring(0, 1)) || line.substring(0, 5) == "Cons.") { // Placed in something
+
             let results = [];
+
             while (/\d/g.test(line.substring(0, 1)) || line.substring(0, 5) == "Cons.") {
+
                 let temp = line.indexOf(")");
+
                 if (line.indexOf("RULE") != -1) {
                     temp = line.indexOf("RULE") + 3;
-                } else if (line.indexOf("I-D") != -1 && line.indexOf("I-D") < 25) {
+                } else if (line.indexOf("I-D") != -1 && line.indexOf("I-D") < 40) {
                     temp = line.indexOf("I-D") + 2;
                 }
+
                 let result = line.substring(0, temp + 1);
+
                 results.push(result);
                 line = line.slice(temp + 1).trim();
+
             }
 
-            results.push(line);
+            if (line != "") {
+                results.push(line);
+            }
+
+
             return results;
         } else {
             return null;
