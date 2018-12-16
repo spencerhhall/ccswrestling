@@ -13,7 +13,7 @@
 
 
     function initialize() {
-        sendRequest(132);
+        sendRequest(126);
     }
 
 
@@ -96,12 +96,47 @@
             line = line.slice(temp).trim();
 
 
-            console.log(line);
+            if (line.indexOf("Others") != -1) {
+                line = line.slice(0, line.indexOf("Others")).trim();
+            }
+
+
+            if (line.indexOf("LEAGUE") != -1 || line.indexOf("NATIONALS") != -1) {
+                let prevresults = []
+                if (line.indexOf("LEAGUE") != -1 && line.indexOf("NATIONALS") != -1) {
+                    temp = Math.min(line.indexOf("LEAGUE"), line.indexOf("NATIONALS"));
+                    let temp2 = Math.max(line.indexOf("LEAGUE"), line.indexOf("NATIONALS"));
+
+                    prevresults.push(line.substring(temp, temp2).trim());
+                    prevresults.push(line.substring(temp2).trim());
+
+                    wrestler.prevresults = prevresults;
+                    line = line.slice(0, temp2).trim();
+                } else if (line.indexOf("LEAGUE") != -1) {
+                    temp = line.indexOf("LEAGUE");
+                    prevresults.push(line.substring(temp).trim());
+
+                    wrestler.prevresults = prevresults;
+                    line = line.slice(0, temp).trim();
+                } else if (line.indexOf("NATIONALS") != -1) {
+                    temp = line.indexOf("NATIONALS");
+                    prevresults.push(line.substring(temp).trim());
+
+                    wrestler.prevresults = prevresults;
+                    line = line.slice(0, temp).trim();
+                }
+            } else {
+                wrestler.prevresults = null;
+            }
+
+            console.log(":" + line);
 
 
 
-            // LAST 3
-            //console.log(wrestler.rank + " has left:" + line);
+            if (line != "") {
+
+            }
+
 
             /* if (line.indexOf(" ") == -1) {
                  wrestler.results = null;
@@ -138,7 +173,6 @@
 
              }*/
 
-
             wrestlers.push(wrestler);
         }
 
@@ -148,31 +182,31 @@
 
 
 
-    /*
-        function parseResults(line) {
-            // It will either be a number from 0-10 or Cons.
-            if (/\d/g.test(line.substring(0, 1)) || line.substring(0, 5) == "Cons.") { // Placed in something
-                let results = [];
-                while (/\d/g.test(line.substring(0, 1)) || line.substring(0, 5) == "Cons.") {
-                    let temp = line.indexOf(")");
-                    if (line.indexOf("RULE") != -1) {
-                        temp = line.indexOf("RULE") + 3;
-                    } else if (line.indexOf("I-D") != -1 && line.indexOf("I-D") < 25) {
-                        temp = line.indexOf("I-D") + 2;
-                    }
-                    let result = line.substring(0, temp + 1);
-                    results.push(result);
-                    line = line.slice(temp + 1).trim();
+
+    function parseResults(line) {
+        // It will either be a number from 0-10 or Cons.
+        if (/\d/g.test(line.substring(0, 1)) || line.substring(0, 5) == "Cons.") { // Placed in something
+            let results = [];
+            while (/\d/g.test(line.substring(0, 1)) || line.substring(0, 5) == "Cons.") {
+                let temp = line.indexOf(")");
+                if (line.indexOf("RULE") != -1) {
+                    temp = line.indexOf("RULE") + 3;
+                } else if (line.indexOf("I-D") != -1 && line.indexOf("I-D") < 25) {
+                    temp = line.indexOf("I-D") + 2;
                 }
-
-                results.push(line);
-                return results;
-            } else {
-                return null;
+                let result = line.substring(0, temp + 1);
+                results.push(result);
+                line = line.slice(temp + 1).trim();
             }
-        }
 
-    */
+            results.push(line);
+            return results;
+        } else {
+            return null;
+        }
+    }
+
+
 
 
     /*function parseHeadHead(line) {
@@ -206,14 +240,8 @@
         } else {
             return null;
         }
-    }
-*/
+    }*/
 
-
-
-    function parsePrevResults(line) {
-        return null;
-    }
 
 
 
@@ -224,8 +252,6 @@
             document.getElementById("content").append(div);
         });
     }
-
-
 
 
 })();
