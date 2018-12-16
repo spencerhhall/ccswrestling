@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 
-
 <html lang="en-us">
-
 
 <head>
     <meta charset="utf-8">
@@ -12,17 +10,31 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 </head>
 
-
 <body>
     <header>
+        <select id="weight-class" required>
+            <option label="None" value="">None</option>
+            <option label="106" value="106">106</option>
+            <option label="113" value="113">113</option>
+            <option label="120" value="120">120</option>
+            <option label="126" value="126">126</option>
+            <option label="132" value="132">132</option>
+            <option label="138" value="138">138</option>
+            <option label="145" value="145">145</option>
+            <option label="152" value="152">152</option>
+            <option label="160" value="160">160</option>
+            <option label="170" value="170">170</option>
+            <option label="182" value="182">182</option>
+            <option label="195" value="195">195</option>
+            <option label="220" value="220">220</option>
+            <option label="285" value="285">285</option>
+        </select>
+        <button id="submit" type="submit">Search</button>
     </header>
 
-    <main id="content">
+    <main>
+        <div id="content-area"></div>
     </main>
-
-    <footer>
-    </footer>
 </body>
-
 
 </html>
