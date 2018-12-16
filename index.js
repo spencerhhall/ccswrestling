@@ -13,14 +13,14 @@
 
 
     function initialize() {
-        sendRequest(113);
+        sendRequest(132);
     }
 
 
     function sendRequest(weightClass) {
         let athleteData = [];
 
-        $.getJSON('http://www.whateverorigin.org/get?url=' + encodeURIComponent('http://www.ccsrank.com/CCSDATA' + weightClass + '.htm') + '&callback=?', function(data) {
+        $.getJSON("http://www.whateverorigin.org/get?url=" + encodeURIComponent("http://www.ccsrank.com/CCSDATA" + weightClass + ".htm") + "&callback=?", function(data) {
             let athleteData = $(data.contents).text().replace(/(<([^>]+)>)/ig, ""); // Removes html tags
             athleteData = athleteData.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, ""); // Trims whitespace
             athleteData = athleteData.replace(/[\n\r]+/g, " "); // Removes line breaks
@@ -29,26 +29,10 @@
             athleteData = athleteData.split(/  \d |  \d\d |  - /); // Breaks the data into lines about each wrestler
 
             let parsedData = parseData(athleteData);
-            // Order of data in athletes' lines (r- always present, n- not always)
-            // last week's rank (r) | name (r) | year (r) | school (r) | section (r) | 18-19 results (n) | head-head (n) | previous results (n)
-            // r | r | r | r | r | n | n | n
-            // Ways to identify
-            // last week's rank: first character or two in the string
-            // name: 2-3 tokens
-            // year: all caps, only 4 options
-            // school: limited options, 1-4 tokens
-            // section: 7 options, 1 token
-            // These last few are tricky because they may not even exist
-            // 18-19 results: starts with number of "Cons."
-            // head-head: 2-4 characters to start (all caps)
-            // previous results: all caps with limited options
-
-
-
-
+            populatePage(parsedData);
         });
-
     }
+
 
     function parseData(data) {
         for (let i = 1; i < data.length; i++) {
@@ -112,67 +96,133 @@
             line = line.slice(temp).trim();
 
 
+            console.log(line);
+
+
+
             // LAST 3
             //console.log(wrestler.rank + " has left:" + line);
 
-            if (line.indexOf(" ") == -1) {
-                wrestler.results = null;
-                wrestler.hh = null;
-                wrestler.prevresults = null;
-            } else {
+            /* if (line.indexOf(" ") == -1) {
+                 wrestler.results = null;
+                 wrestler.hh = null;
+                 wrestler.prevresults = null;
+             } else {
 
-                let results = parseResults(line);
-                let hh = parseHeadHead(results[-1]);
-
-
-                if (results.length == 1) {
-                    wrestler.results = null;
-                } else {
-                    results.pop();
-                    wrestler.results = null;
-                }
+                 let results = parseResults(line);
 
 
 
+                 if (results == null) {
+                     wrestler.results = null;
+                 } else {
+                     line = results.pop();
+                     wrestler.results = results;
+                 }
 
-            }
+
+
+                 let hh = parseHeadHead(line);
+
+                 if (hh == null) {
+                     wrestler.hh = null;
+                 } else {
+                     if (hh.length > 1) {
+                         line = hh.pop();
+                     }
+
+                     wrestler.hh = hh;
+                 }
+
+
+
+             }*/
 
 
             wrestlers.push(wrestler);
         }
 
         console.log(wrestlers);
+        return wrestlers;
     }
 
 
 
+    /*
+        function parseResults(line) {
+            // It will either be a number from 0-10 or Cons.
+            if (/\d/g.test(line.substring(0, 1)) || line.substring(0, 5) == "Cons.") { // Placed in something
+                let results = [];
+                while (/\d/g.test(line.substring(0, 1)) || line.substring(0, 5) == "Cons.") {
+                    let temp = line.indexOf(")");
+                    if (line.indexOf("RULE") != -1) {
+                        temp = line.indexOf("RULE") + 3;
+                    } else if (line.indexOf("I-D") != -1 && line.indexOf("I-D") < 25) {
+                        temp = line.indexOf("I-D") + 2;
+                    }
+                    let result = line.substring(0, temp + 1);
+                    results.push(result);
+                    line = line.slice(temp + 1).trim();
+                }
 
-    function parseResults(line) {
-        // It will either be a number from 0-10 or Cons.
-        if (/\d/g.test(line.substring(0, 1)) || line.substring(0, 5) == "Cons.") { // Placed in something
-            let results = [];
-            while (/\d/g.test(line.substring(0, 1)) || line.substring(0, 5) == "Cons.") {
-                let temp = line.indexOf(")");
-                let result = line.substring(0, temp + 1);
-                results.push(result);
-                line = line.slice(temp + 1).trim();
+                results.push(line);
+                return results;
+            } else {
+                return null;
             }
+        }
 
-            results.push(line);
-            return results;
+    */
+
+
+    /*function parseHeadHead(line) {
+        // It will not star with League or Nationals
+
+        if (line.substring(0, 6) != "LEAGUE" && line.substring(0, 6) != "NATION") { // Placed in something
+            let hh = [];
+
+
+            //while (line.substring(0, 3) != "LEA" && line.substring(0, 3) != "NAT" && line.substring(0, 3) != "Oth" && line.length > 5) {
+                let temp = line.indexOf(")");
+
+
+
+                let realTemp = temp;
+                let tempLine = line.slice(temp + 2);
+
+                temp = tempLine.indexOf(" ");
+                realTemp += temp;
+
+                hh.push(line.substring(0, realTemp + 2).trim());
+                console.log(line.substring(0, realTemp + 2).trim());
+                line = line.slice(realTemp + 2).trim();
+
+
+
+
+            //}
+
+            return hh;
         } else {
             return null;
         }
     }
+*/
 
-
-    function parseHeadHead(line) {
-        return null;
-    }
 
 
     function parsePrevResults(line) {
         return null;
+    }
+
+
+
+    function populatePage(wrestlers) {
+        wrestlers.forEach(function(wrestler) {
+            let div = document.createElement("div");
+            div.innerHTML = wrestler.rank + " " + wrestler.lwrank + " " + wrestler.name + " " + wrestler.year + " " + wrestler.school;
+            document.getElementById("content").append(div);
+        });
     }
 
 
