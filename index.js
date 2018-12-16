@@ -4,7 +4,7 @@
 
     // Constants for parsing through an individual wrestler's data
     const YEARS = ["FRESHMAN", "SOPHOMORE", "JUNIOR", "SENIOR"];
-    const SECTIONS = ["SCVAL", "TCAL", "WCAL", "BVAL", "PAL", "SCCAL", "MBL", "MTAL"];
+    const SECTIONS = ["SCVAL", "TCAL", "WCAL", "BVAL", "PAL", "SCCAL", "MBL", "MTAL", "CENTRAL COAST"];
 
     // Array to hold the finished wrestler objects
     let wrestlers = [];
@@ -105,16 +105,77 @@
 
             line = line.slice(temp);
             temp = line.indexOf(" ");
+            if (wrestler.section == "CENTRAL COAST") {
+                line = line.slice(temp).trim();
+                temp = line.indexOf(" ");
+            }
             line = line.slice(temp).trim();
 
 
-            console.log(wrestler.rank + " has left : " + line);
+            // LAST 3
+            //console.log(wrestler.rank + " has left:" + line);
+
+            if (line.indexOf(" ") == -1) {
+                wrestler.results = null;
+                wrestler.hh = null;
+                wrestler.prevresults = null;
+            } else {
+
+                let results = parseResults(line);
+                let hh = parseHeadHead(results[-1]);
+
+
+                if (results.length == 1) {
+                    wrestler.results = null;
+                } else {
+                    results.pop();
+                    wrestler.results = null;
+                }
+
+
+
+
+            }
+
 
             wrestlers.push(wrestler);
         }
 
         console.log(wrestlers);
     }
+
+
+
+
+    function parseResults(line) {
+        // It will either be a number from 0-10 or Cons.
+        if (/\d/g.test(line.substring(0, 1)) || line.substring(0, 5) == "Cons.") { // Placed in something
+            let results = [];
+            while (/\d/g.test(line.substring(0, 1)) || line.substring(0, 5) == "Cons.") {
+                let temp = line.indexOf(")");
+                let result = line.substring(0, temp + 1);
+                results.push(result);
+                line = line.slice(temp + 1).trim();
+            }
+
+            results.push(line);
+            return results;
+        } else {
+            return null;
+        }
+    }
+
+
+    function parseHeadHead(line) {
+        return null;
+    }
+
+
+    function parsePrevResults(line) {
+        return null;
+    }
+
+
 
 
 })();
