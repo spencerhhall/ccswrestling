@@ -66,23 +66,32 @@
 
 
             for(let i = 1; i < athleteData.length; i++) {
+              
               let line = athleteData[i];
-
               let wrestler = new Object();
+
+
 
               wrestler.rank = i;
 
 
+
               let temp = line.indexOf(" "); // the space between the lwrank and name
+              // Checks for lw ranking of alternate weight class
+              console.log(line.substring(temp, temp + 2));
+              if(line.substring(temp + 1, temp + 2) == "(") {
+                console.log("true");
+                temp += 6;
+              }
 
-              wrestler.lwrank = line.substring(0,temp);
 
+
+              wrestler.lwrank = line.substring(0, temp);
               line = line.slice(temp);
 
 
 
               temp = -1;
-
               YEARS.forEach(function(year) {
                 if(line.indexOf(year) != -1) {
                   temp = line.indexOf(year);
@@ -90,26 +99,47 @@
                 }
               });
 
-              
+
+            
+              wrestler.name = line.substring(0, temp).trim();
 
 
-              wrestler.name = line.substring(0, temp);
+
+              line = line.slice(temp);
+              temp = line.indexOf(" ");
+              line = line.slice(temp).trim();
 
 
 
-              temp = line.lastIndexOf(wrestler.year);
-              line = line.slice(0, temp);
+
+
 
 
               //wrestler.school = ;
               //wrestler.section = ;
 
+              temp = -1;
+              SECTIONS.forEach(function(section) {
+                if(line.indexOf(section) != -1) {
+                  temp = line.indexOf(section);
+                  wrestler.section = section;
+                }
+              });
+
+              console.log("temp: " + temp);
+              wrestler.school = line.substring(0, line.indexOf(wrestler.section)).trim();
+
+
+
+
+
+
+              line = line.slice(temp);
+              temp = line.indexOf(" ");
+              line = line.slice(temp).trim();
 
 
               wrestlers.push(wrestler);
-
-
-
             }
 
 
