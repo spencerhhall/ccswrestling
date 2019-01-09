@@ -1,6 +1,9 @@
 (function() {
-    // Holy shit I need to add some comments. I haven't looked at this in a few weeks and
-    // it might as well be Greek.
+    /* Things to do...
+     * 1. Remember what this stuff means
+     * 2. Comment it out
+     * 3. Now that the data is cleaned and whatnot, develop HTML and CSS for aesthetic display
+    */
 
     "use strict";
 
@@ -229,7 +232,7 @@
 
 
 
-        
+
     }
 
 
