@@ -1,4 +1,6 @@
 (function() {
+    // Holy shit I need to add some comments. I haven't looked at this in a few weeks and
+    // it might as well be Greek.
 
     "use strict";
 
@@ -151,6 +153,7 @@
 
                 let hh = [];
                 if (line != "") {
+                    // What in God's name is this regex I cam up with
                     let capture = line.split(/(\d-\d|\d\d-\d\d|\d\d-\d|\d-\d\d|fall|\d:\d\d)/g);
                     for (let i = 0; i < capture.length - 1; i += 2) {
                         let text = capture[i] + capture[i + 1];
@@ -215,6 +218,18 @@
             div.append(p);
             id("content-area").append(div);
         });
+
+
+
+
+
+
+
+
+
+
+
+        
     }
 
 
