@@ -1,58 +1,79 @@
 (function() {
-    /* Things to do...
-     * 1. Remember what this stuff means
-     * 2. Comment it out
-     * 3. Now that the data is cleaned and whatnot, develop HTML and CSS for aesthetic display
-    */
+    /**
+     * Things to do...
+     * 1. Remember what is actually happening
+     * 2. Comment everything
+     * 3. Consider chopping up some of the parsing techniques into smaller methods
+     * 4. Develop HTML and CSS for aesthetic display of data
+     */
 
     "use strict";
 
-    // Constants to help during parsing of an athlete's data
+    // Helpful for optimizing parsing efficiency
+    const CCS_URL = "http://www.ccsrank.com/CCSDATA";
     const YEARS = ["FRESHMAN", "SOPHOMORE", "JUNIOR", "SENIOR"];
     const SECTIONS = ["SCVAL", "TCAL", "WCAL", "BVAL", "PAL", "SCCAL", "MBL",
         "MTAL", "CENTRAL COAST"
     ];
 
-    let wrestlers = []; // Array to hold the finished wrestler objects
+    let wrestlers = []; // Stores all of the finalized wrestler objects
 
     window.addEventListener("load", initialize);
 
 
     /**
-     * Returns the value of an element with a specified id.
-     * @param {string} id - element ID
-     * @returns {string} value of the element with the specified id
+     * Adds functionality to the submit button.
      */
     function initialize() {
-        id("submit").addEventListener("click", function() {
-            let weight = id("weight-class").value;
-            if (weight != "") {
-                sendRequest(weight);
+        $("submit").addEventListener("click", function() {
+            let weightClass = $("weight-class").value;
+            if (weightClass != "") {
+                handleRequest(weightClass);
             }
         });
     }
 
 
     /**
+     * Scrapes the HTML of the specified weight class page and uses some basic regex
+     * to clean up the returned data. Passes the cleaned data to the next method for
+     * further parsing and ultimately, displaying.
+     * @param {string} weightClass - desired weight class specified by user
+     */
+    function handleRequest(weightClass) {
+        let data = retrieveData(weightClass);
+
+        
+
+        // Possible add some sort of error handling here
+        populatePage(data);
+    }
+
+
+    /**
      * Returns the value of an element with a specified id.
      * @param {string} id - element ID
      * @returns {string} value of the element with the specified id
      */
-    function sendRequest(weightClass) {
-        let athleteData = [];
+    function retrieveData(weightClass) {
+        let cleanData = "";
 
-        $.getJSON("http://www.whateverorigin.org/get?url=" + encodeURIComponent("http://www.ccsrank.com/CCSDATA" + weightClass + ".htm") + "&callback=?", function(data) {
-            let athleteData = $(data.contents).text().replace(/(<([^>]+)>)/ig, ""); // Removes html tags
-            athleteData = athleteData.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, ""); // Trims whitespace
-            athleteData = athleteData.replace(/[\n\r]+/g, " "); // Removes line breaks
-            athleteData = athleteData.replace(/\s{2,10}/g, " "); // Removes more than 2 spaces
-            athleteData = athleteData.replace(/[^\x00-\x7F]/g, ""); // Removes special characters
-            athleteData = athleteData.split(/  \d |  \d\d |  - /); // Breaks the data into lines about each wrestler
+        $.getJSON("http://www.whateverorigin.org/get?url=" + encodeURIComponent(CCS_URL + weightClass + ".htm") + "&callback=?", function(data) {
+            let pageData = $(data.contents).text().replace(/(<([^>]+)>)/ig, ""); // Removes html tags
+            pageData = pageData.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, ""); // Trims whitespace
+            pageData = pageData.replace(/[\n\r]+/g, " "); // Removes line breaks
+            pageData = pageData.replace(/\s{2,10}/g, " "); // Removes more than 2 spaces
+            pageData = pageData.replace(/[^\x00-\x7F]/g, ""); // Removes special characters
+            pageData = pageData.split(/  \d |  \d\d |  - /); // Breaks the data into lines about each wrestler
 
-            let parsedData = parseData(athleteData);
-            populatePage(parsedData);
+            cleanData = parseData(pageData);
         });
+
+        return cleanData;
     }
+
+
+
 
 
     /**
@@ -175,6 +196,14 @@
     }
 
 
+
+
+
+
+
+
+
+
     /**
      * Returns the value of an element with a specified id.
      * @param {string} id - element ID
@@ -207,6 +236,14 @@
     }
 
 
+
+
+
+
+
+
+
+
     /**
      * Returns the value of an element with a specified id.
      * @param {string} id - element ID
@@ -219,7 +256,7 @@
             let p = ce("p");
             p.innerHTML = wrestler.rank + " " + wrestler.lwrank + " " + wrestler.name + " " + wrestler.year + " " + wrestler.school + " " + wrestler.section + " " + wrestler.results + " " + wrestler.hh + " " + wrestler.prevresults;
             div.append(p);
-            id("content-area").append(div);
+            $("content-area").append(div);
         });
 
 
@@ -243,10 +280,9 @@
      * @param {string} id - element ID
      * @returns {object} DOM object associated with id.
      */
-    function id(id) {
+    function $(id) {
         return document.getElementById(id);
     }
-
 
     /**
      * Creates and returns a DOM object with the specified tag.

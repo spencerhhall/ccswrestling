@@ -1,3 +1,7 @@
+body {
+	background-color: gray;
+}
+
 #content-area {
 	display: flex;
 	flex-flow: column wrap;
