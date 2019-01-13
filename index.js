@@ -35,42 +35,38 @@
 
 
     /**
-     * Scrapes the HTML of the specified weight class page and uses some basic regex
-     * to clean up the returned data. Passes the cleaned data to the next method for
-     * further parsing and ultimately, displaying.
+     * Uses other methods to retrieve data, parse it, and then display it.
      * @param {string} weightClass - desired weight class specified by user
      */
     function handleRequest(weightClass) {
         let data = retrieveData(weightClass);
-
-        
-
-        // Possible add some sort of error handling here
+        data = parseData(data);
         populatePage(data);
     }
 
 
     /**
-     * Returns the value of an element with a specified id.
-     * @param {string} id - element ID
-     * @returns {string} value of the element with the specified id
+     * Scrapes the raw HTML of the desired page, uses regex to do some basic 
+     * cleaning/structuring, and returns the data.
+     * @param {string} weightClass - desired weight class specified by user
+     * @returns {string} partially cleaned HTML from the desired page (each line is data
+     *      for one wrestler)
      */
     function retrieveData(weightClass) {
-        let cleanData = "";
+        let pageData = "";
 
         $.getJSON("http://www.whateverorigin.org/get?url=" + encodeURIComponent(CCS_URL + weightClass + ".htm") + "&callback=?", function(data) {
-            let pageData = $(data.contents).text().replace(/(<([^>]+)>)/ig, ""); // Removes html tags
+            pageData = $(data.contents).text().replace(/(<([^>]+)>)/ig, ""); // Removes HTML tags
             pageData = pageData.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, ""); // Trims whitespace
             pageData = pageData.replace(/[\n\r]+/g, " "); // Removes line breaks
             pageData = pageData.replace(/\s{2,10}/g, " "); // Removes more than 2 spaces
             pageData = pageData.replace(/[^\x00-\x7F]/g, ""); // Removes special characters
             pageData = pageData.split(/  \d |  \d\d |  - /); // Breaks the data into lines about each wrestler
-
-            cleanData = parseData(pageData);
         });
 
-        return cleanData;
+        return pageData;
     }
+
 
 
 
@@ -82,24 +78,27 @@
      * @returns {string} value of the element with the specified id
      */
     function parseData(data) {
-        for (let i = 1; i < data.length; i++) {
+        for (let i = 1; i < data.length; i++) { // First line isn't relevant
             let line = data[i];
             let wrestler = new Object();
+
 
             // RANK
             wrestler.rank = i;
 
-            // LAST RANK
-            let temp = line.indexOf(" "); // the space between the lwrank and name
-            // Checks for lw ranking of alternate weight class
+
+            // LAST WEEK'S RANK
+            let temp = line.indexOf(" "); // Space between last week's rank and name
+            // Checks if last week's ranking was in a different weight class
             if (line.substring(temp + 1, temp + 2) == "(") {
                 temp += 6;
             }
             wrestler.lwrank = line.substring(0, temp);
             line = line.slice(temp);
 
+
             // YEAR
-            temp = -1;
+            // temp = -1;       *Not really sure I need this because it's guaranteed to change below*
             YEARS.forEach(function(year) {
                 if (line.indexOf(year) != -1) {
                     temp = line.indexOf(year);
@@ -107,21 +106,39 @@
                 }
             });
 
+
             // NAME
             wrestler.name = line.substring(0, temp).trim();
 
             line = line.slice(temp);
+            // Not sure what the fuck this does
             temp = line.indexOf(" ");
             line = line.slice(temp).trim();
 
+
             // SECTION
-            temp = -1;
+            // temp = -1;       *Not really sure I need this because it's guaranteed to change below*
             SECTIONS.forEach(function(section) {
+                // Ran into an error where it would use the section of a person they wrestled
+                // so I had to restrict the range it checked
                 if (line.substring(0, 35).indexOf(section) != -1) {
                     temp = line.indexOf(section);
                     wrestler.section = section;
                 }
             });
+
+
+
+
+
+
+
+
+
+
+            
+
+
 
             // SCHOOL
             wrestler.school = line.substring(0, line.indexOf(wrestler.section)).trim();
@@ -259,18 +276,14 @@
             $("content-area").append(div);
         });
 
-
-
-
-
-
-
-
-
-
-
-
     }
+
+
+
+
+
+
+
 
 
     /* ------------------------------ Helper Functions ------------------------------ */
