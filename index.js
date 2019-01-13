@@ -5,6 +5,9 @@
      * 2. Comment everything
      * 3. Consider chopping up some of the parsing techniques into smaller methods
      * 4. Develop HTML and CSS for aesthetic display of data
+     * 5. To cut down on the length of the "main" method, consider making the 
+     *      page data a global variable so the smaller methods can access it
+     * 6. Go through code and consider making more helper functions
      */
 
     "use strict";
@@ -16,10 +19,12 @@
         "MTAL", "CENTRAL COAST"
     ];
 
-    let wrestlers = []; // Stores all of the finalized wrestler objects
+
+    // let globalData = "";
+    // let globalTemp = "";
+
 
     window.addEventListener("load", initialize);
-
 
     /**
      * Adds functionality to the submit button.
@@ -73,11 +78,15 @@
 
 
     /**
-     * Returns the value of an element with a specified id.
-     * @param {string} id - element ID
-     * @returns {string} value of the element with the specified id
+     * Creates an Object to represent a wrestler and then parses through the HTML
+     * data to add attributes. Ultimately returns the Array of wrestler Objects.
+     * *CONSIDERING CHOPPING THIS UP INTO MUCH SMALLER METHODS WITH GLOBAL VARIABLES*
+     * @param {string} data - partially cleaned HTML data
+     * @returns {Array} holds all wrestler Objects
      */
     function parseData(data) {
+        let wrestlers = []; // Stores all of the finalized wrestler objects
+
         for (let i = 1; i < data.length; i++) { // First line isn't relevant
             let line = data[i];
             let wrestler = new Object();
@@ -109,9 +118,11 @@
 
             // NAME
             wrestler.name = line.substring(0, temp).trim();
-
             line = line.slice(temp);
-            // Not sure what the fuck this does
+            // Not sure whatexactly this does
+            // Initial guess: name comes before year so it slices out the name, temp 
+            // moves to the next section (past year), and then we cut out the year
+            // Possible change to temp = iOf(" ") first and then just once slice
             temp = line.indexOf(" ");
             line = line.slice(temp).trim();
 
@@ -128,23 +139,14 @@
             });
 
 
-
-
-
-
-
-
-
-
-            
-
-
-
             // SCHOOL
             wrestler.school = line.substring(0, line.indexOf(wrestler.section)).trim();
 
+
+            // PREVIOUS RESULTS
             line = line.slice(temp);
             temp = line.indexOf(" ");
+            // Not sure what case this is handling
             if (wrestler.section == "CENTRAL COAST") {
                 line = line.slice(temp).trim();
                 temp = line.indexOf(" ");
@@ -183,8 +185,16 @@
                 wrestler.prevresults = null;
             }
 
+
+
+
+
+
+
+
+            // RESULTS
             if (line != "") {
-                let results = parseResults(line);
+                let results = parseWrestlerResults(line);
                 if (results == null) {
                     wrestler.results = null;
                 } else {
@@ -192,6 +202,12 @@
                     wrestler.results = results;
                 }
 
+
+
+
+
+
+                // HEAD TO HEAD
                 let hh = [];
                 if (line != "") {
                     // What in God's name is this regex I cam up with
@@ -206,29 +222,24 @@
                     wrestler.hh = null;
                 }
             }
+
             wrestlers.push(wrestler);
         }
+
         console.log(wrestlers);
         return wrestlers;
     }
 
 
-
-
-
-
-
-
-
-
     /**
-     * Returns the value of an element with a specified id.
-     * @param {string} id - element ID
-     * @returns {string} value of the element with the specified id
+     * Parses through the given line to find if the wrestler has a "Results" section. Creates
+     * and Array to store each result and then returns it back to the "main" function.
+     * @param {string} line - the remaining section of a wrestler's line
+     * @returns {Array} wrestler's results
      */
-    function parseResults(line) {
+    function parseWrestlerResults(line) {
         // It will either be a number from 0-10 or Cons.
-        if (/\d/g.test(line.substring(0, 1)) || line.substring(0, 5) == "Cons.") { // Placed in something
+        if (/\d/g.test(line.substring(0, 1)) || line.substring(0, 5) == "Cons.") {
             let results = [];
 
             while (/\d/g.test(line.substring(0, 1)) || line.substring(0, 5) == "Cons.") {
@@ -253,18 +264,10 @@
     }
 
 
-
-
-
-
-
-
-
-
     /**
-     * Returns the value of an element with a specified id.
-     * @param {string} id - element ID
-     * @returns {string} value of the element with the specified id
+     * Basically just testing the results of the data retrieving, cleaning, and parsing.
+     * NOT THE FINAL DISPLAY METHOD
+     * @param {Array} wrestlers - holds finalized wrestler Objects
      */
     function populatePage(wrestlers) {
         wrestlers.forEach(function(wrestler) {
@@ -275,15 +278,7 @@
             div.append(p);
             $("content-area").append(div);
         });
-
     }
-
-
-
-
-
-
-
 
 
     /* ------------------------------ Helper Functions ------------------------------ */
