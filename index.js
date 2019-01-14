@@ -1,7 +1,7 @@
 (function() {
     /**
      * Things to do...
-     * 1. Remember what is actually happening
+     * 1. Remember what is happening in the main function
      * 2. Comment everything
      * 3. Consider chopping up some of the parsing techniques into smaller methods
      * 4. Develop HTML and CSS for aesthetic display of data
@@ -19,12 +19,15 @@
         "MTAL", "CENTRAL COAST"
     ];
 
-
-    // let globalData = "";
-    // let globalTemp = "";
+    // Allows individual functions to parse through the same data
+    let wrestlers = []; // Stores all of the finalized wrestler objects
+    let lineAndTemp = [];
 
 
     window.addEventListener("load", initialize);
+
+
+    /* ------------------------------ Main Functions ------------------------------ */
 
     /**
      * Adds functionality to the submit button.
@@ -73,10 +76,6 @@
     }
 
 
-
-
-
-
     /**
      * Creates an Object to represent a wrestler and then parses through the HTML
      * data to add attributes. Ultimately returns the Array of wrestler Objects.
@@ -85,9 +84,14 @@
      * @returns {Array} holds all wrestler Objects
      */
     function parseData(data) {
-        let wrestlers = []; // Stores all of the finalized wrestler objects
 
         for (let i = 1; i < data.length; i++) { // First line isn't relevant
+            lineAndTemp[0] = data[i];
+            lineAndTemp[1] = line.indexOf(" ");
+
+
+
+
             let line = data[i];
             let wrestler = new Object();
 
@@ -102,7 +106,7 @@
             if (line.substring(temp + 1, temp + 2) == "(") {
                 temp += 6;
             }
-            wrestler.lwrank = line.substring(0, temp);
+            wrestler.lwRank = line.substring(0, temp);
             line = line.slice(temp);
 
 
@@ -158,53 +162,43 @@
             }
 
             if (line.indexOf("LEAGUE") != -1 || line.indexOf("NATIONALS") != -1) {
-                let prevresults = []
+                let prevResults = []
                 if (line.indexOf("LEAGUE") != -1 && line.indexOf("NATIONALS") != -1) {
                     temp = Math.min(line.indexOf("LEAGUE"), line.indexOf("NATIONALS"));
                     let temp2 = Math.max(line.indexOf("LEAGUE"), line.indexOf("NATIONALS"));
 
-                    prevresults.push(line.substring(temp, temp2).trim());
-                    prevresults.push(line.substring(temp2).trim());
+                    prevResults.push(line.substring(temp, temp2).trim());
+                    prevResults.push(line.substring(temp2).trim());
 
-                    wrestler.prevresults = prevresults;
+                    wrestler.prevResults = prevResults;
                     line = line.slice(0, temp2).trim();
                 } else if (line.indexOf("LEAGUE") != -1) {
                     temp = line.indexOf("LEAGUE");
-                    prevresults.push(line.substring(temp).trim());
+                    prevResults.push(line.substring(temp).trim());
 
-                    wrestler.prevresults = prevresults;
+                    wrestler.prevResults = prevResults;
                     line = line.slice(0, temp).trim();
                 } else if (line.indexOf("NATIONALS") != -1) {
                     temp = line.indexOf("NATIONALS");
-                    prevresults.push(line.substring(temp).trim());
+                    prevResults.push(line.substring(temp).trim());
 
-                    wrestler.prevresults = prevresults;
+                    wrestler.prevResults = prevResults;
                     line = line.slice(0, temp).trim();
                 }
             } else {
-                wrestler.prevresults = null;
+                wrestler.prevResults = null;
             }
-
-
-
-
-
-
 
 
             // RESULTS
             if (line != "") {
-                let results = parseWrestlerResults(line);
+                let results = getResults(line);
                 if (results == null) {
                     wrestler.results = null;
                 } else {
                     line = results.pop();
                     wrestler.results = results;
                 }
-
-
-
-
 
 
                 // HEAD TO HEAD
@@ -231,13 +225,78 @@
     }
 
 
+    /* ------------------------------ Parsing Functions ------------------------------ */
+
+    /**
+     * Returns the element that has the ID attribute with the specified value.
+     * @param {string} id - element ID
+     */
+    function getRank() {
+
+    }
+
+
+    /**
+     * Returns the element that has the ID attribute with the specified value.
+     * @param {string} id - element ID
+     */
+    function getLastWeeksRank() {
+
+    }
+
+
+    /**
+     * Returns the element that has the ID attribute with the specified value.
+     * @param {string} id - element ID
+     */
+    function getYear() {
+
+    }
+
+
+    /**
+     * Returns the element that has the ID attribute with the specified value.
+     * @param {string} id - element ID
+     */
+    function getName() {
+
+    }
+
+
+    /**
+     * Returns the element that has the ID attribute with the specified value.
+     * @param {string} id - element ID
+     */
+    function getSection() {
+
+    }
+
+
+    /**
+     * Returns the element that has the ID attribute with the specified value.
+     * @param {string} id - element ID
+     */
+    function getSchool() {
+
+    }
+
+
+    /**
+     * Returns the element that has the ID attribute with the specified value.
+     * @param {string} id - element ID
+     */
+    function getPreviousResults() {
+
+    }
+
+
     /**
      * Parses through the given line to find if the wrestler has a "Results" section. Creates
      * and Array to store each result and then returns it back to the "main" function.
      * @param {string} line - the remaining section of a wrestler's line
      * @returns {Array} wrestler's results
      */
-    function parseWrestlerResults(line) {
+    function getResults(line) {
         // It will either be a number from 0-10 or Cons.
         if (/\d/g.test(line.substring(0, 1)) || line.substring(0, 5) == "Cons.") {
             let results = [];
@@ -265,6 +324,17 @@
 
 
     /**
+     * Returns the element that has the ID attribute with the specified value.
+     * @param {string} id - element ID
+     */
+    function getHeadToHead() {
+
+    }
+
+
+    /* ------------------------------ Display Function ------------------------------ */
+
+    /**
      * Basically just testing the results of the data retrieving, cleaning, and parsing.
      * NOT THE FINAL DISPLAY METHOD
      * @param {Array} wrestlers - holds finalized wrestler Objects
@@ -274,7 +344,7 @@
             let div = ce("div");
             div.id = "content-child";
             let p = ce("p");
-            p.innerHTML = wrestler.rank + " " + wrestler.lwrank + " " + wrestler.name + " " + wrestler.year + " " + wrestler.school + " " + wrestler.section + " " + wrestler.results + " " + wrestler.hh + " " + wrestler.prevresults;
+            p.innerHTML = wrestler.rank + " " + wrestler.lwRank + " " + wrestler.name + " " + wrestler.year + " " + wrestler.school + " " + wrestler.section + " " + wrestler.results + " " + wrestler.hh + " " + wrestler.prevResults;
             div.append(p);
             $("content-area").append(div);
         });
