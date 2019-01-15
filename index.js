@@ -5,7 +5,7 @@
      * 2. Comment everything
      * 3. Consider chopping up some of the parsing techniques into smaller methods
      * 4. Develop HTML and CSS for aesthetic display of data
-     * 5. To cut down on the length of the "main" method, consider making the 
+     * 5. To cut down on the length of the "main" method, consider making the
      *      page data a global variable so the smaller methods can access it
      * 6. Go through code and consider making more helper functions
      */
@@ -33,23 +33,14 @@
      * Adds functionality to the submit button.
      */
     function initialize() {
-        $("submit").addEventListener("click", function() {
-            let weightClass = $("weight-class").value;
+        id("submit").addEventListener("click", function() {
+            let weightClass = id("weight-class").value;
             if (weightClass != "") {
-                handleRequest(weightClass);
+                retrieveData(weightClass);
             }
         });
-    }
 
-
-    /**
-     * Uses other methods to retrieve data, parse it, and then display it.
-     * @param {string} weightClass - desired weight class specified by user
-     */
-    function handleRequest(weightClass) {
-        let data = retrieveData(weightClass);
-        data = parseData(data);
-        populatePage(data);
+        retrieveData(126);
     }
 
 
@@ -61,18 +52,18 @@
      *      for one wrestler)
      */
     function retrieveData(weightClass) {
-        let pageData = "";
-
         $.getJSON("http://www.whateverorigin.org/get?url=" + encodeURIComponent(CCS_URL + weightClass + ".htm") + "&callback=?", function(data) {
-            pageData = $(data.contents).text().replace(/(<([^>]+)>)/ig, ""); // Removes HTML tags
+            let pageData = $(data.contents).text().replace(/(<([^>]+)>)/ig, ""); // Removes HTML tags
             pageData = pageData.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, ""); // Trims whitespace
             pageData = pageData.replace(/[\n\r]+/g, " "); // Removes line breaks
             pageData = pageData.replace(/\s{2,10}/g, " "); // Removes more than 2 spaces
             pageData = pageData.replace(/[^\x00-\x7F]/g, ""); // Removes special characters
             pageData = pageData.split(/  \d |  \d\d |  - /); // Breaks the data into lines about each wrestler
+
+            let parsedData = parseData(pageData);
+            populatePage(parsedData);
         });
 
-        return pageData;
     }
 
 
@@ -86,8 +77,8 @@
     function parseData(data) {
 
         for (let i = 1; i < data.length; i++) { // First line isn't relevant
-            lineAndTemp[0] = data[i];
-            lineAndTemp[1] = line.indexOf(" ");
+            //lineAndTemp[0] = data[i];
+            //lineAndTemp[1] = line.indexOf(" ");
 
 
 
@@ -346,7 +337,7 @@
             let p = ce("p");
             p.innerHTML = wrestler.rank + " " + wrestler.lwRank + " " + wrestler.name + " " + wrestler.year + " " + wrestler.school + " " + wrestler.section + " " + wrestler.results + " " + wrestler.hh + " " + wrestler.prevResults;
             div.append(p);
-            $("content-area").append(div);
+            id("content-area").append(div);
         });
     }
 
@@ -355,10 +346,11 @@
 
     /**
      * Returns the element that has the ID attribute with the specified value.
+     * *NOTE: *
      * @param {string} id - element ID
      * @returns {object} DOM object associated with id.
      */
-    function $(id) {
+    function id(id) {
         return document.getElementById(id);
     }
 
