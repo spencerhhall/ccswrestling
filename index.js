@@ -52,6 +52,7 @@
      *      for one wrestler)
      */
     function retrieveData(weightClass) {
+        killTheChildren();
         $.getJSON("http://www.whateverorigin.org/get?url=" + encodeURIComponent(CCS_URL + weightClass + ".htm") + "&callback=?", function(data) {
             let pageData = $(data.contents).text().replace(/(<([^>]+)>)/ig, ""); // Removes HTML tags
             pageData = pageData.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, ""); // Trims whitespace
@@ -350,7 +351,9 @@
 
         wrestlers.forEach(function(wrestler) {
             let div = ce("div");
-            div.id = "content-child";
+            div.classList.add("content-child");
+            // Can filter by: year and section (for now)
+            div.id = wrestler.year.toLowerCase(); + "-" + wrestler.section.toLowerCase();
             let p = ce("p");
             p.innerHTML = wrestler.rank + " " + wrestler.lwRank + " " + wrestler.name + " " + wrestler.year + " " + wrestler.school + " " + wrestler.section + " " + wrestler.results + " " + wrestler.hh + " " + wrestler.prevResults;
             div.append(p);
@@ -360,6 +363,27 @@
 
     function filter(filter) {
         id("filter-test").innerHTML = filter;
+
+        // Filtering by year for now
+        // "", freshman, sophomore, junior, senior
+        if(filter === "") {
+
+        } else {
+            let currentBlocks = qsa(".content-child");
+            currentBlocks.forEach(function(block) {
+                let blockID = block.id;
+                if(!blockID.includes("filter")) {
+                    id(blockID).classList.add("hidden");
+                } else {
+                    id(blockID).classList.remove("hidden");
+                }
+            });
+        }
+    }
+
+    function countDisplay() {
+        let totalBlocks = qsa(".content-child");
+        let trueDisplay = 0;
     }
 
 
@@ -382,6 +406,38 @@
      */
     function ce(el) {
         return document.createElement(el);
+    }
+
+    /**
+     * Returns the array of elements that match the given CSS selector.
+     * @param {string} query - CSS query selector
+     * @returns {object[]} array of DOM objects matching the query.
+     */
+    function qsa(query) {
+        return document.querySelectorAll(query);
+    }
+
+    /**
+     * Toggles the class of an element specified by its id.
+     * @param {string} id - element ID
+     * @param {string} cl - class to be added or removed
+     */
+    function toggle(id, cl) {
+        if ($(id).classList.contains(cl)) {
+            $(id).classList.remove(cl);
+        } else {
+            $(id).classList.add(cl);
+        }
+    }
+
+    /**
+     * Kills all of the child elements of the content-container div.
+     */
+    function killTheChildren() {
+        let contentChildren = qsa(".content-child");
+        contentChildren.forEach(function(child) {
+            child.remove();
+        });
     }
 
 })();
