@@ -17,6 +17,7 @@
     ];
 
     let lineAndTemp = []; // Allows individual functions to work on same pieces of data
+    let activeFilters = []; // year, section
 
     window.addEventListener("load", initialize);
 
@@ -37,7 +38,7 @@
         // No idea why wrapping my function in another function works, but this is the only
         // way I've been able to make it work
         id("filter-year").addEventListener("change", function() {
-            filter(this.value);
+            filter(this);
         });
 
         retrieveData(126);
@@ -346,7 +347,7 @@
      */
     function populatePage(wrestlers) {
         let wrestlerCount = wrestlers.length;
-        id("child-count").innerHTML = "Currently displaying " + wrestlerCount + " wrestlers.";
+        countDisplay();
         console.log(wrestlerCount);
 
         wrestlers.forEach(function(wrestler) {
@@ -367,22 +368,33 @@
     function filter(filter) {
         id("filter-test").innerHTML = filter;
 
+        let filterID = 1;
+        if (filter.id === "filter-year") {
+            activeFilters[0] == filter.value;
+        } else {
+            activeFilters[1] == filter.value;
+            filterID = 0;
+        }
+
         // Filtering by year for now
         // "", freshman, sophomore, junior, senior
         // blocks may or may not be currently hidden
         let totalBlocks = qsa(".content-child");
 
-        totalBlocks.forEach(function(block) {
-            console.log("id of block:" + block.id);
-            console.log(filter);
-            console.log(block.id.includes(filter));
 
-            if(block.id.includes(filter)) {
-                if(block.classList.contains("hidden")) {
-                    block.classList.remove("hidden");
+
+        totalBlocks.forEach(function(block) {
+
+            if (block.id.includes(filter.value)) { // If a filter is relevant
+                if (!block.id.includes(activeFilters[filterID])) {
+
+                } else {
+                    if (block.classList.contains("hidden")) { // Need to handle cases where other filter takes them out
+                        block.classList.remove("hidden");
+                    }
                 }
             } else {
-                if(!block.classList.contains("hidden")) {
+                if (!block.classList.contains("hidden")) {
                     block.classList.add("hidden");
                 }
             }
@@ -404,7 +416,7 @@
             }
         });
 
-        id("child-count").innerHTML = trueDisplay;
+        id("child-count").innerHTML = "Currently displaying " + trueDisplay + " blocks.";
     }
 
 
