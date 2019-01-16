@@ -353,7 +353,7 @@
             let div = ce("div");
             div.classList.add("content-child");
             // Can filter by: year and section (for now)
-            div.id = wrestler.year.toLowerCase(); + "-" + wrestler.section.toLowerCase();
+            div.id = wrestler.year.toLowerCase() + "-" + wrestler.section.toLowerCase();
             let p = ce("p");
             p.innerHTML = wrestler.rank + " " + wrestler.lwRank + " " + wrestler.name + " " + wrestler.year + " " + wrestler.school + " " + wrestler.section + " " + wrestler.results + " " + wrestler.hh + " " + wrestler.prevResults;
             div.append(p);
@@ -361,29 +361,50 @@
         });
     }
 
+
+
+
     function filter(filter) {
         id("filter-test").innerHTML = filter;
 
         // Filtering by year for now
         // "", freshman, sophomore, junior, senior
-        if(filter === "") {
+        // blocks may or may not be currently hidden
+        let totalBlocks = qsa(".content-child");
 
-        } else {
-            let currentBlocks = qsa(".content-child");
-            currentBlocks.forEach(function(block) {
-                let blockID = block.id;
-                if(!blockID.includes("filter")) {
-                    id(blockID).classList.add("hidden");
-                } else {
-                    id(blockID).classList.remove("hidden");
+        totalBlocks.forEach(function(block) {
+            console.log("id of block:" + block.id);
+            console.log(filter);
+            console.log(block.id.includes(filter));
+
+            if(block.id.includes(filter)) {
+                if(block.classList.contains("hidden")) {
+                    block.classList.remove("hidden");
                 }
-            });
-        }
+            } else {
+                if(!block.classList.contains("hidden")) {
+                    block.classList.add("hidden");
+                }
+            }
+        });
+
+        countDisplay();
     }
+
+
+
 
     function countDisplay() {
         let totalBlocks = qsa(".content-child");
         let trueDisplay = 0;
+
+        totalBlocks.forEach(function(block) {
+            if (!block.classList.contains("hidden")) {
+                trueDisplay++;
+            }
+        });
+
+        id("child-count").innerHTML = trueDisplay;
     }
 
 
@@ -415,19 +436,6 @@
      */
     function qsa(query) {
         return document.querySelectorAll(query);
-    }
-
-    /**
-     * Toggles the class of an element specified by its id.
-     * @param {string} id - element ID
-     * @param {string} cl - class to be added or removed
-     */
-    function toggle(id, cl) {
-        if ($(id).classList.contains(cl)) {
-            $(id).classList.remove(cl);
-        } else {
-            $(id).classList.add(cl);
-        }
     }
 
     /**
