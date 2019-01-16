@@ -1,28 +1,22 @@
 (function() {
+
     /**
      * Things to do...
-     * 1. Remember what is happening in the main function
-     * 2. Comment everything
-     * 3. Consider chopping up some of the parsing techniques into smaller methods
-     * 4. Develop HTML and CSS for aesthetic display of data
-     * 5. To cut down on the length of the "main" method, consider making the
-     *      page data a global variable so the smaller methods can access it
-     * 6. Go through code and consider making more helper functions
+     * 1. Break main parsing function into smaller methods
+     * 2. Develop HTML and CSS for aesthetic display of data
+     * 3. Add filters for display
      */
 
     "use strict";
 
-    // Helpful for optimizing parsing efficiency
+    // Helpful for optimizing parsing
     const CCS_URL = "http://www.ccsrank.com/CCSDATA";
     const YEARS = ["FRESHMAN", "SOPHOMORE", "JUNIOR", "SENIOR"];
     const SECTIONS = ["SCVAL", "TCAL", "WCAL", "BVAL", "PAL", "SCCAL", "MBL",
         "MTAL", "CENTRAL COAST"
     ];
 
-    // Allows individual functions to parse through the same data
-    let wrestlers = []; // Stores all of the finalized wrestler objects
-    let lineAndTemp = [];
-
+    let lineAndTemp = []; // Allows individual functions to work on same pieces of data
 
     window.addEventListener("load", initialize);
 
@@ -38,6 +32,12 @@
             if (weightClass != "") {
                 retrieveData(weightClass);
             }
+        });
+
+        // No idea why wrapping my function in another function works, but this is the only
+        // way I've been able to make it work
+        id("filter-year").addEventListener("change", function() {
+            filter(this.value);
         });
 
         retrieveData(126);
@@ -60,10 +60,21 @@
             pageData = pageData.replace(/[^\x00-\x7F]/g, ""); // Removes special characters
             pageData = pageData.split(/  \d |  \d\d |  - /); // Breaks the data into lines about each wrestler
 
-            let parsedData = parseData(pageData);
-            populatePage(parsedData);
+            handleData(pageData);
         });
+    }
 
+
+    /**
+     * Scrapes the raw HTML of the desired page, uses regex to do some basic 
+     * cleaning/structuring, and returns the data.
+     * @param {string} weightClass - desired weight class specified by user
+     * @returns {string} partially cleaned HTML from the desired page (each line is data
+     *      for one wrestler)
+     */
+    function handleData(data) {
+        let parsedData = parseData(data);
+        populatePage(parsedData);
     }
 
 
@@ -75,10 +86,10 @@
      * @returns {Array} holds all wrestler Objects
      */
     function parseData(data) {
-
+        let wrestlers = [];
         for (let i = 1; i < data.length; i++) { // First line isn't relevant
-            //lineAndTemp[0] = data[i];
-            //lineAndTemp[1] = line.indexOf(" ");
+            // lineAndTemp[0] = data[i];
+            // lineAndTemp[1] = line.indexOf(" ");
 
 
 
@@ -325,12 +336,18 @@
 
     /* ------------------------------ Display Function ------------------------------ */
 
+    // I should probably add some sort of main function for this to handle different filters
+
     /**
      * Basically just testing the results of the data retrieving, cleaning, and parsing.
      * NOT THE FINAL DISPLAY METHOD
      * @param {Array} wrestlers - holds finalized wrestler Objects
      */
     function populatePage(wrestlers) {
+        let wrestlerCount = wrestlers.length;
+        id("child-count").innerHTML = "Currently displaying " + wrestlerCount + " wrestlers.";
+        console.log(wrestlerCount);
+
         wrestlers.forEach(function(wrestler) {
             let div = ce("div");
             div.id = "content-child";
@@ -341,12 +358,16 @@
         });
     }
 
+    function filter(filter) {
+        id("filter-test").innerHTML = filter;
+    }
+
 
     /* ------------------------------ Helper Functions ------------------------------ */
 
     /**
      * Returns the element that has the ID attribute with the specified value.
-     * *NOTE: *
+     * *NOTE: DO NOT NAME THIS '$' BECAUSE IT INTERFERES WITH JQUERY*
      * @param {string} id - element ID
      * @returns {object} DOM object associated with id.
      */
