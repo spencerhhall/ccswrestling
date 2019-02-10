@@ -52,6 +52,11 @@
      *      for one wrestler)
      */
     function retrieveData(weightClass) {
+        let filter = id("filter-year");
+        if (!filter.classList.contains("hidden")) {
+            filter.classList.add("hidden")
+        }
+
         killTheChildren();
         $.getJSON("http://www.whateverorigin.org/get?url=" + encodeURIComponent(CCS_URL + weightClass + ".htm") + "&callback=?", function(data) {
             let pageData = $(data.contents).text().replace(/(<([^>]+)>)/ig, ""); // Removes HTML tags
@@ -223,7 +228,7 @@
             wrestlers.push(wrestler);
         }
 
-        // console.log(wrestlers);
+        console.log(wrestlers);
         return wrestlers;
     }
 
@@ -346,7 +351,7 @@
      */
     function populatePage(wrestlers) {
         let wrestlerCount = wrestlers.length;
-        
+
 
         wrestlers.forEach(function(wrestler) {
             let div = ce("div");
@@ -354,11 +359,18 @@
             // Can filter by: year and section (for now)
             div.id = wrestler.year.toLowerCase() + "-" + wrestler.section.toLowerCase();
             let p = ce("p");
-            p.innerHTML = wrestler.rank + " " + wrestler.lwRank + " " + wrestler.name + " " + wrestler.year + " " + wrestler.school + " " + wrestler.section + " " + wrestler.results + " " + wrestler.hh + " " + wrestler.prevResults;
+            p.innerHTML = wrestler.rank + " " + wrestler.lwRank + " " + wrestler.name + " " + wrestler.year + " " + wrestler.school + " " + wrestler.section + " " + wrestler.results + " " + wrestler.prevResults;
             div.append(p);
             id("content-area").append(div);
             countDisplay();
         });
+
+        let filter = id("filter-year");
+
+        if (filter.classList.contains("hidden")) {
+            filter.classList.remove("hidden");
+        }
+        filter.selectedIndex = 0;
     }
 
 
@@ -367,26 +379,19 @@
     function filter(filter) {
         id("filter-test").innerHTML = filter.value;
 
-        
-
         // Filtering by year for now
         // "", freshman, sophomore, junior, senior
         // blocks may or may not be currently hidden
         let totalBlocks = qsa(".content-child");
 
-
         totalBlocks.forEach(function(block) {
-
             if (block.id.includes(filter.value)) { // If a filter is relevant
-                
-                
-
                 if (block.classList.contains("hidden")) {
                     block.classList.remove("hidden");
                 }
             } else {
                 if (!block.classList.contains("hidden")) { // Need to handle cases where other filter takes them out
-                        block.classList.add("hidden");
+                    block.classList.add("hidden");
                 }
             }
         });
