@@ -13,11 +13,10 @@
     const CCS_URL = "http://www.ccsrank.com/CCSDATA";
     const YEARS = ["FRESHMAN", "SOPHOMORE", "JUNIOR", "SENIOR"];
     const SECTIONS = ["SCVAL", "TCAL", "WCAL", "BVAL", "PAL", "SCCAL", "MBL",
-        "MTAL", "CENTRAL COAST"
+        "MTAL", "CENTRAL COAST", "PCAL"
     ];
 
     let lineAndTemp = []; // Allows individual functions to work on same pieces of data
-    let activeFilters = []; // year, section
 
     window.addEventListener("load", initialize);
 
@@ -41,7 +40,7 @@
             filter(this);
         });
 
-        retrieveData(126);
+        //retrieveData(126);
     }
 
 
@@ -224,7 +223,7 @@
             wrestlers.push(wrestler);
         }
 
-        console.log(wrestlers);
+        // console.log(wrestlers);
         return wrestlers;
     }
 
@@ -347,8 +346,7 @@
      */
     function populatePage(wrestlers) {
         let wrestlerCount = wrestlers.length;
-        countDisplay();
-        console.log(wrestlerCount);
+        
 
         wrestlers.forEach(function(wrestler) {
             let div = ce("div");
@@ -359,6 +357,7 @@
             p.innerHTML = wrestler.rank + " " + wrestler.lwRank + " " + wrestler.name + " " + wrestler.year + " " + wrestler.school + " " + wrestler.section + " " + wrestler.results + " " + wrestler.hh + " " + wrestler.prevResults;
             div.append(p);
             id("content-area").append(div);
+            countDisplay();
         });
     }
 
@@ -366,15 +365,9 @@
 
 
     function filter(filter) {
-        id("filter-test").innerHTML = filter;
+        id("filter-test").innerHTML = filter.value;
 
-        let filterID = 1;
-        if (filter.id === "filter-year") {
-            activeFilters[0] == filter.value;
-        } else {
-            activeFilters[1] == filter.value;
-            filterID = 0;
-        }
+        
 
         // Filtering by year for now
         // "", freshman, sophomore, junior, senior
@@ -382,20 +375,18 @@
         let totalBlocks = qsa(".content-child");
 
 
-
         totalBlocks.forEach(function(block) {
 
             if (block.id.includes(filter.value)) { // If a filter is relevant
-                if (!block.id.includes(activeFilters[filterID])) {
+                
+                
 
-                } else {
-                    if (block.classList.contains("hidden")) { // Need to handle cases where other filter takes them out
-                        block.classList.remove("hidden");
-                    }
+                if (block.classList.contains("hidden")) {
+                    block.classList.remove("hidden");
                 }
             } else {
-                if (!block.classList.contains("hidden")) {
-                    block.classList.add("hidden");
+                if (!block.classList.contains("hidden")) { // Need to handle cases where other filter takes them out
+                        block.classList.add("hidden");
                 }
             }
         });
